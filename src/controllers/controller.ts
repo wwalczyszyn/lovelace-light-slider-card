@@ -11,6 +11,8 @@ export interface ControllerConfig {
   step?: number;
   attribute?: string;
   grow?: boolean;
+  slider_width?: string;
+  slider_height?: string;
 }
 
 export abstract class Controller {
@@ -42,6 +44,9 @@ export abstract class Controller {
 
   get string(): string {
     return `${this.value}`;
+  }
+  instantString(value: number): string {
+    return value == 0 ? this._hass.localize("component.light.state._.off") : `${value}`;
   }
   get hidden(): boolean {
     return false;
@@ -77,5 +82,11 @@ export abstract class Controller {
   }
   get step(): number {
     return this._config.step ?? this._step ?? 5;
+  }
+  get sliderWidth(): string {
+    return this._config.slider_width ?? "150px";
+  }
+  get sliderHeight(): string {
+    return this._config.slider_height ?? "400px";
   }
 }

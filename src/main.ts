@@ -4,7 +4,7 @@ import { getController } from "./controllers/get-controller";
 import { Controller, ControllerConfig } from "./controllers/controller";
 import pjson from "../package.json";
 
-class SliderEntityRow extends LitElement {
+class LightSliderCard extends LitElement {
   _config: ControllerConfig;
   ctrl: Controller;
 
@@ -57,10 +57,7 @@ class SliderEntityRow extends LitElement {
       c.stateObj.state !== "unavailable" &&
       c.hasSlider &&
       !(c.isOff && this._config.hide_when_off);
-    const showToggle = this._config.toggle && c.hasToggle;
-    const showValue = showToggle
-      ? false
-      : this._config.hide_state === false
+    const showValue = this._config.hide_state === false
       ? true
       : this._config.hide_state || this.hide_state
       ? false
@@ -68,35 +65,28 @@ class SliderEntityRow extends LitElement {
       ? false
       : true;
 
+const sliderColoredByLight = false;//temp
+
     const content = html`
       <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
-        ${showSlider
-          ? html`
-              <ha-slider
-                .min=${c.min}
-                .max=${c.max}
-                .step=${c.step}
-                .value=${c.value}
-                .dir=${dir}
-                pin
-                @change=${(ev) =>
-                  (c.value = (this.shadowRoot.querySelector(
-                    "ha-slider"
-                  ) as any).value)}
-                class=${this._config.full_row || this._config.grow
-                  ? "full"
-                  : ""}
-                ignore-bar-touch
-              ></ha-slider>
-            `
-          : ""}
-        ${showToggle ? c.renderToggle(this.hass) : ""}
         ${showValue
-          ? html`<span class="state">
+          ? html`<span id="slider-value" class="state">
               ${c.stateObj.state === "unavailable"
                 ? this.hass.localize("state.default.unavailable")
                 : c.string}
             </span>`
+          : ""}
+        ${showSlider
+          ? html`
+              <div class="range-holder" style="--slider-height: ${c.sliderHeight};--slider-width: ${c.sliderWidth};">
+                <input type="range" style="--slider-height: ${c.sliderHeight}; --slider-width: ${c.sliderWidth}; --slider-border-radius: ${'20px'}; ${sliderColoredByLight ? '--slider-color:' + 'white' + ';' : '--slider-color:' + 'white' + ';'}--slider-thumb-color:${'black'};--slider-track-color:${'black'};"                  
+                    .value="${this._updateCurrentValue(c)}"
+                    .min=${c.min}
+                    .max=${c.max}
+                    @input=${e => this._previewValue(c, e)}
+                    @change=${e => this._setValue(c, e)}>
+              </div>
+            `
           : ""}
       </div>
     `;
@@ -106,10 +96,28 @@ class SliderEntityRow extends LitElement {
       else return content;
 
     return html`
-      <hui-generic-entity-row .hass=${this.hass} .config=${this._config}>
+      <ha-card>
         ${content}
-      </hui-generic-entity-row>
+      </ha-card>
     `;
+  }
+
+  _updateCurrentValue(c: Controller) {
+    const sliderValueEl = this.shadowRoot.getElementById("slider-value");
+    if (sliderValueEl) { sliderValueEl.innerText = c.string; }
+
+    return c.isOff ? 0 : c.value;
+  }
+
+  _previewValue(c: Controller, e) {
+      const sliderValueEl = this.shadowRoot.getElementById("slider-value");
+      if (sliderValueEl) { sliderValueEl.innerText = c.instantString(e.target.value); }
+    
+  }
+
+  _setValue(c: Controller, e) {
+      c.value = e.target.value
+    
   }
 
   static get styles() {
@@ -119,12 +127,12 @@ class SliderEntityRow extends LitElement {
         align-items: center;
         justify-content: flex-end;
         flex: 100;
-        height: 40px;
+        //height: 40px;
       }
       .state {
-        min-width: 45px;
-        text-align: end;
-        margin-left: 5px;
+        //min-width: 45px;
+        //text-align: end;
+        //margin-left: 5px;
       }
       ha-entity-toggle {
         min-width: auto;
@@ -137,14 +145,100 @@ class SliderEntityRow extends LitElement {
       ha-slider:not(.full) {
         max-width: 200px;
       }
+
+
+      .state {
+        margin-top: 10px;
+        margin: 20px 0;
+        font-size: 1.6rem;
+      }
+      .wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex: 100;
+        flex-direction: column;
+      }
+      .range-holder {
+        height: var(--slider-height);
+        width: var(--slider-width);
+        position: relative;
+        display: block;
+
+        margin: auto;
+      }
+      .range-holder input[type="range"] {
+          outline: 0;
+          border: 0;
+          border-radius: var(--slider-border-radius, 12px);
+          width: var(--slider-height);
+          margin: 0;
+          transition: box-shadow 0.2s ease-in-out;
+          -webkit-transform:rotate(270deg);
+          -moz-transform:rotate(270deg);
+          -o-transform:rotate(270deg);
+          -ms-transform:rotate(270deg);
+          transform:rotate(270deg);
+          overflow: hidden;
+          height: var(--slider-width);
+          -webkit-appearance: none;
+          background-color: var(--slider-track-color);
+          position: absolute;
+          top: calc(50% - (var(--slider-width) / 2));
+          right: calc(50% - (var(--slider-height) / 2));
+      }
+      .range-holder input[type="range"]::-webkit-slider-runnable-track {
+          height: var(--slider-width);
+          -webkit-appearance: none;
+          background-color: var(--slider-track-color);
+          margin-top: -1px;
+          transition: box-shadow 0.2s ease-in-out;
+      }
+      .range-holder input[type="range"]::-webkit-slider-thumb {
+          width: 25px;
+          border-right:10px solid var(--slider-color);
+          border-left:10px solid var(--slider-color);
+          border-top:20px solid var(--slider-color);
+          border-bottom:20px solid var(--slider-color);
+          -webkit-appearance: none;
+          height: 80px;
+          cursor: ew-resize;
+          background: var(--slider-color);
+          box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
+          border-radius: 0;
+          transition: box-shadow 0.2s ease-in-out;
+          position: relative;
+          top: calc((var(--slider-width) - 80px) / 2);
+      }
+      .range-holder input[type="range"]::-moz-thumb-track {
+          height: var(--slider-width);
+          background-color: var(--slider-track-color);
+          margin-top: -1px;
+          transition: box-shadow 0.2s ease-in-out;
+      }
+      .range-holder input[type="range"]::-moz-range-thumb {
+          width: 5px;
+          border-right:12px solid var(--slider-color);
+          border-left:12px solid var(--slider-color);
+          border-top:20px solid var(--slider-color);
+          border-bottom:20px solid var(--slider-color);
+          height: calc(var(--slider-width)*.4);
+          cursor: ew-resize;
+          background: var(--slider-color);
+          box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
+          border-radius: 0;
+          transition: box-shadow 0.2s ease-in-out;
+          position: relative;
+          top: calc((var(--slider-width) - 80px) / 2);
+      }
     `;
   }
 }
 
-if (!customElements.get("slider-entity-row")) {
-  customElements.define("slider-entity-row", SliderEntityRow);
+if (!customElements.get("light-slider-card")) {
+  customElements.define("light-slider-card", LightSliderCard);
   console.info(
-    `%cSLIDER-ENTITY-ROW ${pjson.version} IS INSTALLED`,
+    `%cLIGHT-SLIDER-CARD ${pjson.version} IS INSTALLED`,
     "color: green; font-weight: bold",
     ""
   );

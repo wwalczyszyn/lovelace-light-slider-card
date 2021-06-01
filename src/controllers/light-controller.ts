@@ -145,6 +145,24 @@ export class LightController extends Controller {
         return this.value;
     }
   }
+  instantString(value: number): string {
+    switch (this.attribute) {
+      case "color_temp":
+        return `${value}`;
+      case "brightness":
+        return value == 0 ? this._hass.localize("component.light.state._.off") : `${value}`;
+      case "brightness_pct":
+        return value == 0 ? this._hass.localize("component.light.state._.off") : `${value} %`;
+      case "saturation":
+        return `${value} %`;
+      case "hue":
+        return `${value} °`;
+      case "effect":
+        return this.stateObj ? `${value}` : "";
+      default:
+        return `${value}`;
+    }
+  }
 
   get hasSlider() {
     if (!this.stateObj) return false;
