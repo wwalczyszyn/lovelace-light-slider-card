@@ -22,11 +22,6 @@ class LightSliderCard extends LitElement {
 
   async resized() {
     await this.updateComplete;
-    if (!this.shadowRoot) return;
-    this.hide_state = this._config.full_row
-      ? this.parentElement.clientWidth <= 180
-      : this.parentElement.clientWidth <= 335;
-    return;
   }
 
   async firstUpdated() {
