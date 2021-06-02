@@ -53,8 +53,8 @@ class LightSliderCard extends LitElement {
     const sliderHeight = this._config.slider_height ?? "400px";
     const sliderBorderRadius = this._config.slider_corner_radius ?? "var(--ha-card-border-radius)";
     const sliderColor = this._config.slider_color ? this._config.slider_color : c.sliderColor;
-    const trackColor = this._config.track_color ? this._config.track_color : c.trackColor;
-    const thumbColor = this._config.thumb_color ? this._config.thumb_color : c.thumbColor;
+    const trackColor = this._config.slider_track_color ? this._config.slider_track_color : c.sliderTrackColor;
+    const thumbColor = this._config.slider_thumb_color ? this._config.slider_thumb_color : c.sliderThumbColor;
     const stateColor = this._config.state_color ?? "var(--primary-text-color)";
 
     return html`

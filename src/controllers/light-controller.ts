@@ -176,6 +176,47 @@ export class LightController extends Controller {
         return `${value}`;
     }
   }
+  sliderInstantColor(value: number): string {
+    switch (this.attribute) {
+      case "brightness":
+      case "brightness_pct":
+        if (value == 0 && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
+          return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(158, 158, 158)";
+        }
+    }
+
+    return super.sliderInstantColor(value);
+  }
+
+  get _slider_color_rgb_off(): string {
+    return "rgb(80, 80, 80)";
+  }
+
+  get _slider_color_rgb_0(): string {
+    switch (this.attribute) {
+      case "color_temp":
+      case "color_temp_pct":
+        return "rgb(226, 250, 255)";
+      case "brightness":
+      case "brightness_pct":
+        return "rgb(82, 82, 82)";
+      default:
+        return null;
+    }
+  }
+
+  get _slider_color_rgb_100(): string {
+    switch (this.attribute) {
+      case "color_temp":
+      case "color_temp_pct":
+        return "rgb(255, 180, 0)";
+      case "brightness":
+      case "brightness_pct":
+        return "rgb(255, 255, 255)";
+      default:
+        return null;
+    }
+  }
 
   get hasSlider() {
     if (!this.stateObj) return false;

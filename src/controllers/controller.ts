@@ -10,8 +10,8 @@ export interface ControllerConfig {
   slider_width?: string;
   slider_height?: string;
   slider_color?: string;
-  thumb_color?: string;
-  track_color?: string;
+  slider_thumb_color?: string;
+  slider_track_color?: string;
   state_color?: string;
   slider_corner_radius?: string;
   slider_color_rgb_off?: string;
@@ -29,9 +29,9 @@ export abstract class Controller {
   abstract _min?: number;
   abstract _max?: number;
   abstract _step?: number;
-  _slider_color_rgb_off?: string;
-  _slider_color_rgb_0?: string;
-  _slider_color_rgb_100?: string;
+  get _slider_color_rgb_off(): string { return null; }
+  get _slider_color_rgb_0(): string { return null; }
+  get _slider_color_rgb_100(): string { return null; }
 
   constructor(config: ControllerConfig) {
     this._config = config;
@@ -120,10 +120,10 @@ export abstract class Controller {
 
     return this._config.slider_color ?? "var(--accent-color)";
   }
-  get trackColor(): string {
-    return this._config.track_color ?? "var(--disabled-text-color)";
+  get sliderTrackColor(): string {
+    return this._config.slider_track_color ?? "var(--disabled-text-color)";
   }
-  get thumbColor(): string {
-    return this._config.thumb_color ?? "var(--disabled-text-color)";
+  get sliderThumbColor(): string {
+    return this._config.slider_thumb_color ?? "var(--disabled-text-color)";
   }
 }
