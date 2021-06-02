@@ -3,6 +3,7 @@ import { html } from "lit-element";
 export interface ControllerConfig {
   entity: string;
   hide_state?: boolean;
+  state_position?: string;
   min?: number;
   max?: number;
   step?: number;

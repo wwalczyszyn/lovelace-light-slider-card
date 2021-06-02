@@ -49,6 +49,7 @@ class LightSliderCard extends LitElement {
 
     const showSlider = c.stateObj.state !== "unavailable" && c.hasSlider;
     const showValue = !this._config.hide_state;
+    const statePosition = this._config.state_position ?? "above";
     const sliderWidth = this._config.slider_width ?? "150px";
     const sliderHeight = this._config.slider_height ?? "400px";
     const sliderBorderRadius = this._config.slider_corner_radius ?? "var(--ha-card-border-radius)";
@@ -60,7 +61,7 @@ class LightSliderCard extends LitElement {
     return html`
       <ha-card>
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
-        ${showValue
+        ${showValue && statePosition === "above"
         ? html`<span id="slider-value" class="state">
               ${c.stateObj.state === "unavailable"
             ? this.hass.localize("state.default.unavailable")
@@ -77,6 +78,15 @@ class LightSliderCard extends LitElement {
                     .step=${c.step}
                     @input=${e => this._previewValue(c, e)}
                     @change=${e => this._setValue(c, e)}>
+                    
+                    ${showValue && statePosition === "inside"
+                    ? html`<span id="slider-value" class="state inside">
+                        ${c.stateObj.state === "unavailable"
+                      ? this.hass.localize("state.default.unavailable")
+                      : c.string}
+                      </span>`
+                    : ""}
+                  </input>
               </div>
             `
         : ""}
@@ -137,6 +147,14 @@ class LightSliderCard extends LitElement {
         margin: 10px 0px 20px 0;
         font-size: 1.6rem;
         color: var(--state-color);
+      }
+      .state.inside {
+        position: absolute;
+        width: var(--slider-width);
+        display: block;
+        text-align: center;
+        bottom: 20%;
+        margin: initial;
       }
       .wrapper {
         padding: 10px;
