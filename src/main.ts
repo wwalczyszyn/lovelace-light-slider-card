@@ -9,7 +9,6 @@ class LightSliderCard extends LitElement {
   ctrl: Controller;
 
   @property() hass: any;
-  @property() hide_state: boolean;
 
   setConfig(config: ControllerConfig) {
     this._config = config;
@@ -35,10 +34,10 @@ class LightSliderCard extends LitElement {
       return html`
         <hui-warning>
           ${this.hass.localize(
-            "ui.panel.lovelace.warning.entity_not_found",
-            "entity",
-            this._config.entity
-          )}
+        "ui.panel.lovelace.warning.entity_not_found",
+        "entity",
+        this._config.entity
+      )}
         </hui-warning>
       `;
 
@@ -48,51 +47,40 @@ class LightSliderCard extends LitElement {
       ? "rtl"
       : "ltr";
 
-    const showSlider =
-      c.stateObj.state !== "unavailable" &&
-      c.hasSlider &&
-      !(c.isOff && this._config.hide_when_off);
-    const showValue = this._config.hide_state === false
-      ? true
-      : this._config.hide_state || this.hide_state
-      ? false
-      : c.isOff && this._config.hide_when_off
-      ? false
-      : true;
+    const showSlider = c.stateObj.state !== "unavailable" && c.hasSlider;
+    const showValue = !this._config.hide_state;
+    const sliderWidth = this._config.slider_width ?? "150px";
+    const sliderHeight = this._config.slider_height ?? "400px";
+    const sliderBorderRadius = this._config.slider_corner_radius ?? "var(--ha-card-border-radius)";
+    const sliderColor = this._config.slider_color ? this._config.slider_color : c.sliderColor;
+    const trackColor = this._config.track_color ? this._config.track_color : c.trackColor;
+    const thumbColor = this._config.thumb_color ? this._config.thumb_color : c.thumbColor;
+    const stateColor = this._config.state_color ?? "var(--primary-text-color)";
 
-const sliderColoredByLight = false;//temp
-
-    const content = html`
-      <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
+    return html`
+      <ha-card>
+        <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
         ${showValue
-          ? html`<span id="slider-value" class="state">
+        ? html`<span id="slider-value" class="state">
               ${c.stateObj.state === "unavailable"
-                ? this.hass.localize("state.default.unavailable")
-                : c.string}
+            ? this.hass.localize("state.default.unavailable")
+            : c.string}
             </span>`
-          : ""}
+        : ""}
         ${showSlider
-          ? html`
-              <div class="range-holder" style="--slider-height: ${c.sliderHeight};--slider-width: ${c.sliderWidth};">
-                <input type="range" style="--slider-height: ${c.sliderHeight}; --slider-width: ${c.sliderWidth}; --slider-border-radius: ${'20px'}; ${sliderColoredByLight ? '--slider-color:' + 'white' + ';' : '--slider-color:' + 'white' + ';'}--slider-thumb-color:${'black'};--slider-track-color:${'black'};"                  
+        ? html`
+              <div class="range-holder" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
+                <input type="range" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor};"                  
                     .value="${this._updateCurrentValue(c)}"
                     .min=${c.min}
                     .max=${c.max}
+                    .step=${c.step}
                     @input=${e => this._previewValue(c, e)}
                     @change=${e => this._setValue(c, e)}>
               </div>
             `
-          : ""}
-      </div>
-    `;
-
-    if (this._config.full_row)
-      if (this._config.hide_when_off && c.isOff) return html``;
-      else return content;
-
-    return html`
-      <ha-card>
-        ${content}
+        : ""}
+        </div>
       </ha-card>
     `;
   }
@@ -105,14 +93,14 @@ const sliderColoredByLight = false;//temp
   }
 
   _previewValue(c: Controller, e) {
-      const sliderValueEl = this.shadowRoot.getElementById("slider-value");
-      if (sliderValueEl) { sliderValueEl.innerText = c.instantString(e.target.value); }
-    
+    const sliderValueEl = this.shadowRoot.getElementById("slider-value");
+    if (sliderValueEl) { sliderValueEl.innerText = c.instantString(e.target.value); }
+
   }
 
   _setValue(c: Controller, e) {
-      c.value = e.target.value
-    
+    c.value = e.target.value
+
   }
 
   static get styles() {
@@ -146,6 +134,7 @@ const sliderColoredByLight = false;//temp
         margin-top: 10px;
         margin: 20px 0;
         font-size: 1.6rem;
+        color: var(--state-color);
       }
       .wrapper {
         display: flex;

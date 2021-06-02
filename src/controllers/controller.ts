@@ -2,17 +2,20 @@ import { html } from "lit-element";
 
 export interface ControllerConfig {
   entity: string;
-  toggle?: boolean;
   hide_state?: boolean;
-  hide_when_off?: boolean;
-  full_row?: boolean;
   min?: number;
   max?: number;
   step?: number;
   attribute?: string;
-  grow?: boolean;
   slider_width?: string;
   slider_height?: string;
+  slider_color?: string;
+  thumb_color?: string;
+  track_color?: string;
+  state_color?: string;
+  slider_corner_radius?: string;
+  slider_color_0?: string;
+  slider_color_100?: string;
 }
 
 export abstract class Controller {
@@ -83,10 +86,14 @@ export abstract class Controller {
   get step(): number {
     return this._config.step ?? this._step ?? 5;
   }
-  get sliderWidth(): string {
-    return this._config.slider_width ?? "150px";
+  
+  get sliderColor(): string {
+    return this._config.slider_color ?? "var(--accent-color)";
   }
-  get sliderHeight(): string {
-    return this._config.slider_height ?? "400px";
+  get trackColor(): string {
+    return this._config.track_color ?? "var(--disabled-text-color)";
+  }
+  get thumbColor(): string {
+    return this._config.thumb_color ?? "var(--disabled-text-color)";
   }
 }

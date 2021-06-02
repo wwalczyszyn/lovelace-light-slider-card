@@ -13,25 +13,25 @@ export class LightController extends Controller {
     const attrs = this.stateObj.attributes;
     switch (this.attribute) {
       case "color_temp":
-        return Math.round(attrs.color_temp);
+        return attrs.color_temp;
       case "color_temp_pct":
-        return Math.round((attrs.color_temp - attrs.min_mireds) / (attrs.max_mireds - attrs.min_mireds) * 100);
+        return (attrs.color_temp - attrs.min_mireds) / (attrs.max_mireds - attrs.min_mireds) * 100;
       case "white_value":
-        return Math.round(attrs.white_value);
+        return attrs.white_value;
       case "brightness":
-        return Math.round(attrs.brightness);
+        return attrs.brightness;
       case "brightness_pct":
-        return Math.round((attrs.brightness * 100.0) / 255);
+        return attrs.brightness * 100.0 / 255;
       case "red":
       case "green":
       case "blue":
         return attrs.rgb_color
-          ? Math.round(attrs.rgb_color[RGB_INDEX[this.attribute]])
+          ? attrs.rgb_color[RGB_INDEX[this.attribute]]
           : 0;
       case "hue":
       case "saturation":
         return attrs.hs_color
-          ? Math.round(attrs.hs_color[HS_INDEX[this.attribute]])
+          ? attrs.hs_color[HS_INDEX[this.attribute]]
           : 0;
       case "effect":
         if (attrs.effect_list) return attrs.effect_list.indexOf(attrs.effect);
@@ -97,7 +97,7 @@ export class LightController extends Controller {
         value =
           attr === "brightness"
             ? Math.round(value)
-            : Math.round((value / 100.0) * 255);
+            : Math.round(value / 100.0 * 255);
         if (!value) on = false;
         attr = "brightness";
         break;
