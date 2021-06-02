@@ -2,7 +2,13 @@ import { html } from "lit-element";
 
 export interface ControllerConfig {
   entity: string;
+  title?: string;
+  icon?: string;
+  hide_title?: boolean;
+  hide_icon?: boolean;
   hide_state?: boolean;
+  hide_thumb?: boolean;
+  transparent_card?: boolean;
   state_position?: string;
   min?: number;
   max?: number;
@@ -30,6 +36,7 @@ export abstract class Controller {
   abstract _min?: number;
   abstract _max?: number;
   abstract _step?: number;
+  abstract _icon?: string;
   get _slider_color_rgb_off(): string { return null; }
   get _slider_color_rgb_0(): string { return null; }
   get _slider_color_rgb_100(): string { return null; }
@@ -91,6 +98,9 @@ export abstract class Controller {
   }
   get step(): number {
     return this._config.step ?? this._step ?? 5;
+  }
+  get icon(): string {
+    return this._config.icon ?? this._icon ?? this.stateObj.attributes.icon ?? 'mdi:lightbulb';
   }
 
   get sliderColor(): string {

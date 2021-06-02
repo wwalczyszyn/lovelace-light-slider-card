@@ -49,6 +49,11 @@ class LightSliderCard extends LitElement {
 
     const showSlider = c.stateObj.state !== "unavailable" && c.hasSlider;
     const showValue = !this._config.hide_state;
+    const showTitle = !this._config.hide_title;
+    const showIcon = !this._config.hide_icon;
+    const hideThumb = this._config.hide_thumb;
+    const transparentCard = this._config.transparent_card;
+    const title = this._config.title ?? c.stateObj.attributes.friendly_name;
     const statePosition = this._config.state_position ?? "above";
     const sliderWidth = this._config.slider_width ?? "150px";
     const sliderHeight = this._config.slider_height ?? "400px";
@@ -59,18 +64,24 @@ class LightSliderCard extends LitElement {
     const stateColor = this._config.state_color ?? "var(--primary-text-color)";
 
     return html`
-      <ha-card>
+      <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
-        ${showValue && statePosition === "above"
-        ? html`<span id="slider-value" class="state">
-              ${c.stateObj.state === "unavailable"
-            ? this.hass.localize("state.default.unavailable")
-            : c.string}
-            </span>`
+          <div class="title-wrapper">
+            ${showIcon ? html`
+            <ha-icon icon="${c.icon}"></ha-icon>`
+        : ""}
+            ${showTitle ? html`
+            <span class="title">${title}</span>`
+        : ""}
+          </div>
+        ${showValue && statePosition === "above" ? html`
+          <span id="slider-value" class="state">
+              ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
+          </span>`
         : ""}
         ${showSlider
         ? html`
-              <div class="range-holder" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
+              <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
                 <input type="range" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor};"                  
                     .value="${this._updateCurrentValue(c)}"
                     .min=${c.min}
@@ -79,14 +90,11 @@ class LightSliderCard extends LitElement {
                     @input=${e => this._previewValue(c, e)}
                     @change=${e => this._setValue(c, e)}>
                     
-                    ${showValue && statePosition === "inside"
-                    ? html`<span id="slider-value" class="state inside">
-                        ${c.stateObj.state === "unavailable"
-                      ? this.hass.localize("state.default.unavailable")
-                      : c.string}
-                      </span>`
-                    : ""}
-                  </input>
+                ${showValue && statePosition === "inside" ? html`
+                <span id="slider-value" class="state inside">
+                    ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
+                </span>`
+            : ""}
               </div>
             `
         : ""}
@@ -123,29 +131,22 @@ class LightSliderCard extends LitElement {
         align-items: center;
         justify-content: flex-end;
         flex: 100;
-        //height: 40px;
       }
-      .state {
-        //min-width: 45px;
-        //text-align: end;
-        //margin-left: 5px;
+      .title-wrapper {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
       }
-      ha-entity-toggle {
-        min-width: auto;
-        margin-left: 8px;
+      .title-wrapper > ha-icon + span {
+        margin-left: 10px;
       }
-      ha-slider {
-        width: 100%;
-        min-width: 100px;
+      .title {
+        font-size: 24px;
       }
-      ha-slider:not(.full) {
-        max-width: 200px;
-      }
-
-
       .state {
         margin: 10px 0px 20px 0;
-        font-size: 1.6rem;
+        font-size: 22px;
         color: var(--state-color);
       }
       .state.inside {
@@ -199,6 +200,12 @@ class LightSliderCard extends LitElement {
           margin-top: -1px;
           //transition: box-shadow 0.2s ease-in-out;
       }
+      .range-holder input[type="range"]::-moz-thumb-track {
+        height: var(--slider-width);
+        background-color: var(--slider-track-color);
+        margin-top: -1px;
+        //transition: box-shadow 0.2s ease-in-out;
+      }
       .range-holder input[type="range"]::-webkit-slider-thumb {
           width: 25px;
           border-right:10px solid var(--slider-color);
@@ -207,7 +214,7 @@ class LightSliderCard extends LitElement {
           border-bottom:20px solid var(--slider-color);
           -webkit-appearance: none;
           height: 80px;
-          cursor: ew-resize;
+          cursor: grab;
           background: var(--slider-color);
           box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
           border-radius: 0;
@@ -215,11 +222,8 @@ class LightSliderCard extends LitElement {
           position: relative;
           top: calc((var(--slider-width) - 80px) / 2);
       }
-      .range-holder input[type="range"]::-moz-thumb-track {
-          height: var(--slider-width);
-          background-color: var(--slider-track-color);
-          margin-top: -1px;
-          //transition: box-shadow 0.2s ease-in-out;
+      .range-holder.hide-thumb input[type="range"]::-webkit-slider-thumb {
+        box-shadow: -350px 0 0 350px var(--slider-color);
       }
       .range-holder input[type="range"]::-moz-range-thumb {
           width: 5px;
@@ -228,13 +232,16 @@ class LightSliderCard extends LitElement {
           border-top:20px solid var(--slider-color);
           border-bottom:20px solid var(--slider-color);
           height: calc(var(--slider-width)*.4);
-          cursor: ew-resize;
+          cursor: grab;
           background: var(--slider-color);
           box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
           border-radius: 0;
           //transition: box-shadow 0.2s ease-in-out;
           position: relative;
           top: calc((var(--slider-width) - 80px) / 2);
+      }
+      .range-holder.hide-thumb input[type="range"]::-moz-range-thumb {
+        box-shadow: -350px 0 0 350px var(--slider-color);
       }
     `;
   }
