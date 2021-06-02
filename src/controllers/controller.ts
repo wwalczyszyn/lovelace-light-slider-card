@@ -14,6 +14,7 @@ export interface ControllerConfig {
   track_color?: string;
   state_color?: string;
   slider_corner_radius?: string;
+  slider_color_rgb_off?: string;
   slider_color_rgb_0?: string;
   slider_color_rgb_100?: string;
   slider_color_auto?: boolean;
@@ -28,8 +29,9 @@ export abstract class Controller {
   abstract _min?: number;
   abstract _max?: number;
   abstract _step?: number;
-  abstract _slider_color_rgb_0?: string;
-  abstract _slider_color_rgb_100?: string;
+  _slider_color_rgb_off?: string;
+  _slider_color_rgb_0?: string;
+  _slider_color_rgb_100?: string;
 
   constructor(config: ControllerConfig) {
     this._config = config;
@@ -91,7 +93,11 @@ export abstract class Controller {
   }
 
   get sliderColor(): string {
-    return this.sliderInstantColor(this.value);
+    if (this.isOff && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
+      return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(158, 158, 158)";
+    } else {
+      return this.sliderInstantColor(this.value);
+    }
   }
   sliderInstantColor(value: number): string {
     if (this._config.slider_color_auto || (this._config.slider_color_rgb_0 && this._config.slider_color_rgb_100)) {

@@ -134,6 +134,10 @@ export class LightController extends Controller {
     }
   }
 
+  get isOff() {
+    return this.stateObj && this.stateObj.state === "off";
+  }
+
   get string() {
     if (this.stateObj && this.stateObj.state === "off")
       return this._hass.localize("component.light.state._.off");
@@ -141,7 +145,7 @@ export class LightController extends Controller {
       case "color_temp":
       case "brightness":
         return `${this.value}`;
-      case "color_temp_pct":  
+      case "color_temp_pct":
       case "brightness_pct":
       case "saturation":
         return `${this.value} %`;

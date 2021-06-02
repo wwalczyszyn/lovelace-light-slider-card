@@ -134,12 +134,12 @@ class LightSliderCard extends LitElement {
 
 
       .state {
-        margin-top: 10px;
-        margin: 20px 0;
+        margin: 10px 0px 20px 0;
         font-size: 1.6rem;
         color: var(--state-color);
       }
       .wrapper {
+        padding: 10px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
