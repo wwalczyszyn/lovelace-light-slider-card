@@ -10,29 +10,31 @@ export class LightController extends Controller {
 
   get _value() {
     if (!this.stateObj || this.stateObj.state !== "on") return 0;
-    const attr = this.stateObj.attributes;
+    const attrs = this.stateObj.attributes;
     switch (this.attribute) {
       case "color_temp":
-        return Math.round(attr.color_temp);
+        return Math.round(attrs.color_temp);
+      case "color_temp_pct":
+        return Math.round((attrs.color_temp - attrs.min_mireds) / (attrs.max_mireds - attrs.min_mireds) * 100);
       case "white_value":
-        return Math.round(attr.white_value);
+        return Math.round(attrs.white_value);
       case "brightness":
-        return Math.round(attr.brightness);
+        return Math.round(attrs.brightness);
       case "brightness_pct":
-        return Math.round((attr.brightness * 100.0) / 255);
+        return Math.round((attrs.brightness * 100.0) / 255);
       case "red":
       case "green":
       case "blue":
-        return attr.rgb_color
-          ? Math.round(attr.rgb_color[RGB_INDEX[this.attribute]])
+        return attrs.rgb_color
+          ? Math.round(attrs.rgb_color[RGB_INDEX[this.attribute]])
           : 0;
       case "hue":
       case "saturation":
-        return attr.hs_color
-          ? Math.round(attr.hs_color[HS_INDEX[this.attribute]])
+        return attrs.hs_color
+          ? Math.round(attrs.hs_color[HS_INDEX[this.attribute]])
           : 0;
       case "effect":
-        if (attr.effect_list) return attr.effect_list.indexOf(attr.effect);
+        if (attrs.effect_list) return attrs.effect_list.indexOf(attrs.effect);
         return 0;
       default:
         return 0;
@@ -81,10 +83,15 @@ export class LightController extends Controller {
 
   set _value(value) {
     if (!this.stateObj) return;
+    const attrs = this.stateObj.attributes;
     let attr = this.attribute;
     let on = true;
     let _value;
     switch (attr) {
+      case "color_temp_pct":
+        value = Math.round(value / 100 * (attrs.max_mireds - attrs.min_mireds)) + attrs.min_mireds;
+        attr = "color_temp"
+        break;
       case "brightness":
       case "brightness_pct":
         value =
@@ -134,6 +141,7 @@ export class LightController extends Controller {
       case "color_temp":
       case "brightness":
         return `${this.value}`;
+      case "color_temp_pct":  
       case "brightness_pct":
       case "saturation":
         return `${this.value} %`;
@@ -153,6 +161,7 @@ export class LightController extends Controller {
         return value == 0 ? this._hass.localize("component.light.state._.off") : `${value}`;
       case "brightness_pct":
         return value == 0 ? this._hass.localize("component.light.state._.off") : `${value} %`;
+      case "color_temp_pct":
       case "saturation":
         return `${value} %`;
       case "hue":
@@ -177,6 +186,7 @@ export class LightController extends Controller {
           return true;
         return false;
       case "color_temp":
+      case "color_temp_pct":
         if ("color_temp" in this.stateObj.attributes) return true;
         if (
           "supported_features" in this.stateObj.attributes &&
