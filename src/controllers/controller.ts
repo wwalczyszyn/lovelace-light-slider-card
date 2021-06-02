@@ -14,8 +14,9 @@ export interface ControllerConfig {
   track_color?: string;
   state_color?: string;
   slider_corner_radius?: string;
-  slider_color_0?: string;
-  slider_color_100?: string;
+  slider_color_rgb_0?: string;
+  slider_color_rgb_100?: string;
+  slider_color_auto?: boolean;
 }
 
 export abstract class Controller {
@@ -27,6 +28,8 @@ export abstract class Controller {
   abstract _min?: number;
   abstract _max?: number;
   abstract _step?: number;
+  abstract _slider_color_rgb_0?: string;
+  abstract _slider_color_rgb_100?: string;
 
   constructor(config: ControllerConfig) {
     this._config = config;
@@ -86,8 +89,29 @@ export abstract class Controller {
   get step(): number {
     return this._config.step ?? this._step ?? 5;
   }
-  
+
   get sliderColor(): string {
+    return this.sliderInstantColor(this.value);
+  }
+  sliderInstantColor(value: number): string {
+    if (this._config.slider_color_auto || (this._config.slider_color_rgb_0 && this._config.slider_color_rgb_100)) {
+      const startColor = this._config.slider_color_rgb_0 ?? this._slider_color_rgb_0 ?? "rgb(158, 158, 158)";
+      const endColor = this._config.slider_color_rgb_100 ?? this._slider_color_rgb_100 ?? "rgb(250, 250, 250)";
+
+      const startColorRgb = startColor.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+      const endColorRgb = endColor.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+
+      if (startColorRgb && endColorRgb) {
+        const x = (value - this.min) / (this.max - this.min);
+
+        const r = parseInt(startColorRgb[1]) + x * (parseInt(endColorRgb[1]) - parseInt(startColorRgb[1]));
+        const g = parseInt(startColorRgb[2]) + x * (parseInt(endColorRgb[2]) - parseInt(startColorRgb[2]));
+        const b = parseInt(startColorRgb[3]) + x * (parseInt(endColorRgb[3]) - parseInt(startColorRgb[3]));
+
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+    }
+
     return this._config.slider_color ?? "var(--accent-color)";
   }
   get trackColor(): string {

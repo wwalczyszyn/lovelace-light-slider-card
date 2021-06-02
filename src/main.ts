@@ -96,6 +96,9 @@ class LightSliderCard extends LitElement {
     const sliderValueEl = this.shadowRoot.getElementById("slider-value");
     if (sliderValueEl) { sliderValueEl.innerText = c.instantString(e.target.value); }
 
+    if (this._config.slider_color_auto || (this._config.slider_color_rgb_0 && this._config.slider_color_rgb_100)) {
+      e.target.style.setProperty('--slider-color', c.sliderInstantColor(e.target.value));
+    }
   }
 
   _setValue(c: Controller, e) {
@@ -157,7 +160,7 @@ class LightSliderCard extends LitElement {
           border-radius: var(--slider-border-radius, 12px);
           width: var(--slider-height);
           margin: 0;
-          transition: box-shadow 0.2s ease-in-out;
+          //transition: box-shadow 0.2s ease-in-out;
           -webkit-transform:rotate(270deg);
           -moz-transform:rotate(270deg);
           -o-transform:rotate(270deg);
@@ -176,7 +179,7 @@ class LightSliderCard extends LitElement {
           -webkit-appearance: none;
           background-color: var(--slider-track-color);
           margin-top: -1px;
-          transition: box-shadow 0.2s ease-in-out;
+          //transition: box-shadow 0.2s ease-in-out;
       }
       .range-holder input[type="range"]::-webkit-slider-thumb {
           width: 25px;
@@ -190,7 +193,7 @@ class LightSliderCard extends LitElement {
           background: var(--slider-color);
           box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
           border-radius: 0;
-          transition: box-shadow 0.2s ease-in-out;
+          //transition: box-shadow 0.2s ease-in-out;
           position: relative;
           top: calc((var(--slider-width) - 80px) / 2);
       }
@@ -198,7 +201,7 @@ class LightSliderCard extends LitElement {
           height: var(--slider-width);
           background-color: var(--slider-track-color);
           margin-top: -1px;
-          transition: box-shadow 0.2s ease-in-out;
+          //transition: box-shadow 0.2s ease-in-out;
       }
       .range-holder input[type="range"]::-moz-range-thumb {
           width: 5px;
@@ -211,7 +214,7 @@ class LightSliderCard extends LitElement {
           background: var(--slider-color);
           box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
           border-radius: 0;
-          transition: box-shadow 0.2s ease-in-out;
+          //transition: box-shadow 0.2s ease-in-out;
           position: relative;
           top: calc((var(--slider-width) - 80px) / 2);
       }
