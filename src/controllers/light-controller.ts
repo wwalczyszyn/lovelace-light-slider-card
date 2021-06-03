@@ -133,6 +133,9 @@ export class LightController extends Controller {
       });
     }
   }
+  get _icon(): string {
+    return 'mdi:lightbulb';
+  }
 
   get isOff() {
     return this.stateObj && this.stateObj.state === "off";
@@ -189,7 +192,7 @@ export class LightController extends Controller {
   }
 
   get _slider_color_rgb_off(): string {
-    return "rgb(80, 80, 80)";
+    return "rgb(70, 70, 70)";
   }
 
   get _slider_color_rgb_0(): string {
@@ -212,7 +215,7 @@ export class LightController extends Controller {
         return "rgb(255, 180, 0)";
       case "brightness":
       case "brightness_pct":
-        return "rgb(255, 255, 255)";
+        return "rgb(240, 240, 240)";
       default:
         return null;
     }

@@ -20,6 +20,10 @@ export interface ControllerConfig {
   slider_thumb_color?: string;
   slider_track_color?: string;
   state_color?: string;
+  title_color?: string;
+  icon_color?: string;
+  icon_size?: string;
+  icon_position?: string;
   slider_corner_radius?: string;
   slider_color_rgb_off?: string;
   slider_color_rgb_0?: string;
@@ -37,9 +41,9 @@ export abstract class Controller {
   abstract _max?: number;
   abstract _step?: number;
   abstract _icon?: string;
-  get _slider_color_rgb_off(): string { return null; }
-  get _slider_color_rgb_0(): string { return null; }
-  get _slider_color_rgb_100(): string { return null; }
+  abstract _slider_color_rgb_off?: string ;
+  abstract _slider_color_rgb_0?: string;
+  abstract _slider_color_rgb_100?: string;
 
   constructor(config: ControllerConfig) {
     this._config = config;

@@ -62,20 +62,24 @@ class LightSliderCard extends LitElement {
     const trackColor = this._config.slider_track_color ? this._config.slider_track_color : c.sliderTrackColor;
     const thumbColor = this._config.slider_thumb_color ? this._config.slider_thumb_color : c.sliderThumbColor;
     const stateColor = this._config.state_color ?? "var(--primary-text-color)";
+    const titleColor = this._config.title_color ?? "var(--primary-text-color)";
+    const iconColor = this._config.icon_color ?? "var(--primary-text-color)";
+    const iconSize = this._config.icon_size;
+    const iconPosition = this._config.icon_position ?? "inline";
 
     return html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
           <div class="title-wrapper">
-            ${showIcon ? html`
-            <ha-icon icon="${c.icon}"></ha-icon>`
+            ${showIcon && iconPosition === "inline" ? html`
+            <ha-icon icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
             ${showTitle ? html`
-            <span class="title">${title}</span>`
+            <span class="title" style="color: ${titleColor}">${title}</span>`
         : ""}
           </div>
-        ${showValue && statePosition === "above" ? html`
-          <span id="slider-value" class="state">
+        ${showValue && (statePosition === "above" || statePosition === "below") ? html`
+          <span id="slider-value" class="state ${statePosition}">
               ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
           </span>`
         : ""}
@@ -90,11 +94,16 @@ class LightSliderCard extends LitElement {
                     @input=${e => this._previewValue(c, e)}
                     @change=${e => this._setValue(c, e)}>
                     
-                ${showValue && statePosition === "inside" ? html`
-                <span id="slider-value" class="state inside">
-                    ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
-                </span>`
+                <div class="inside-wrapper">
+                    ${showIcon && iconPosition === "inside" ? html`
+                    <ha-icon class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
             : ""}
+                    ${showValue && statePosition === "inside" ? html`
+                    <span id="slider-value" class="state ${statePosition}">
+                        ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
+                    </span>`
+            : ""}
+                </div>
               </div>
             `
         : ""}
@@ -137,25 +146,46 @@ class LightSliderCard extends LitElement {
         align-items: center;
         margin-top: 10px;
         margin-bottom: 20px;
+        max-width: 100%;
       }
       .title-wrapper > ha-icon + span {
         margin-left: 10px;
       }
       .title {
         font-size: 24px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
       .state {
         margin: 10px 0px 20px 0;
         font-size: 22px;
         color: var(--state-color);
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
-      .state.inside {
+      .state.below {
+        order: 1;
+        margin: 20px 0px 10px 0;
+      }
+      .inside-wrapper {
         position: absolute;
         width: var(--slider-width);
+        text-align: center;
+        bottom: calc(0.45 * var(--slider-width));
+      }
+      .inside-wrapper > ha-icon {
+        -webkit-filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+        filter: drop-shadow(rgba(0, 0, 0, 0.2) 0 1px 3px);
+      }
+      .state.inside {
         display: block;
         text-align: center;
-        bottom: 20%;
-        margin: initial;
+        margin: 20px 10px 0 10px;
+        -webkit-filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+        filter: drop-shadow(rgba(0, 0, 0, 0.2) 0 1px 3px);
       }
       .wrapper {
         padding: 10px;
