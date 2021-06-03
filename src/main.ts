@@ -61,6 +61,7 @@ class LightSliderCard extends LitElement {
     const sliderColor = this._config.slider_color ? this._config.slider_color : c.sliderColor;
     const trackColor = this._config.slider_track_color ? this._config.slider_track_color : c.sliderTrackColor;
     const thumbColor = this._config.slider_thumb_color ? this._config.slider_thumb_color : c.sliderThumbColor;
+    const thumbSize = this._config.slider_thumb_size ?? "80px";
     const stateColor = this._config.state_color ?? "var(--primary-text-color)";
     const titleColor = this._config.title_color ?? "var(--primary-text-color)";
     const iconColor = this._config.icon_color ?? "var(--primary-text-color)";
@@ -85,7 +86,7 @@ class LightSliderCard extends LitElement {
         : ""}
         
           <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
-            <input type="range" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor};"                  
+            <input type="range" style="--slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor}; --thumb-size: ${thumbSize};"                  
                 .value="${this._updateCurrentValue(c)}"
                 .min=${c.min}
                 .max=${c.max}
@@ -197,7 +198,6 @@ class LightSliderCard extends LitElement {
         width: var(--slider-width);
         position: relative;
         display: block;
-
         margin: auto;
       }
       .range-holder input[type="range"] {
@@ -240,14 +240,14 @@ class LightSliderCard extends LitElement {
           border-top:20px solid var(--slider-color);
           border-bottom:20px solid var(--slider-color);
           -webkit-appearance: none;
-          height: 80px;
+          height: var(--thumb-size);
           cursor: grab;
           background: var(--slider-color);
           box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
           border-radius: 0;
           //transition: box-shadow 0.2s ease-in-out;
           position: relative;
-          top: calc((var(--slider-width) - 80px) / 2);
+          top: calc((var(--slider-width) - var(--thumb-size)) / 2);
       }
       .range-holder.hide-thumb input[type="range"]::-webkit-slider-thumb {
         box-shadow: -350px 0 0 350px var(--slider-color);
@@ -258,14 +258,14 @@ class LightSliderCard extends LitElement {
           border-left:12px solid var(--slider-color);
           border-top:20px solid var(--slider-color);
           border-bottom:20px solid var(--slider-color);
-          height: calc(var(--slider-width)*.4);
+          height: calc(var(--thumb-size) - 2*20px);
           cursor: grab;
           background: var(--slider-color);
           box-shadow: -350px 0 0 350px var(--slider-color), inset 0 0 0 80px var(--slider-thumb-color);
           border-radius: 0;
           //transition: box-shadow 0.2s ease-in-out;
           position: relative;
-          top: calc((var(--slider-width) - 80px) / 2);
+          top: calc((var(--slider-width) - (var(--thumb-size) - 2*20px)) / 2);
       }
       .range-holder.hide-thumb input[type="range"]::-moz-range-thumb {
         box-shadow: -350px 0 0 350px var(--slider-color);

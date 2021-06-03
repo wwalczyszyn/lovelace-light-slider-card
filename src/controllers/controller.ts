@@ -18,6 +18,7 @@ export interface ControllerConfig {
   slider_height?: string;
   slider_color?: string;
   slider_thumb_color?: string;
+  slider_thumb_size?: string;
   slider_track_color?: string;
   state_color?: string;
   title_color?: string;
