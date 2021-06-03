@@ -67,7 +67,7 @@ class LightSliderCard extends LitElement {
     const iconSize = this._config.icon_size;
     const iconPosition = this._config.icon_position ?? "inline";
 
-    return html`
+    return showSlider ? html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
           <div class="title-wrapper">
@@ -83,33 +83,30 @@ class LightSliderCard extends LitElement {
               ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
           </span>`
         : ""}
-        ${showSlider
-        ? html`
-              <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
-                <input type="range" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor};"                  
-                    .value="${this._updateCurrentValue(c)}"
-                    .min=${c.min}
-                    .max=${c.max}
-                    .step=${c.step}
-                    @input=${e => this._previewValue(c, e)}
-                    @change=${e => this._setValue(c, e)}>
-                    
-                <div class="inside-wrapper">
-                    ${showIcon && iconPosition === "inside" ? html`
-                    <ha-icon class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
-            : ""}
-                    ${showValue && statePosition === "inside" ? html`
-                    <span id="slider-value" class="state ${statePosition}">
-                        ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
-                    </span>`
-            : ""}
-                </div>
-              </div>
-            `
+        
+          <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
+            <input type="range" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor};"                  
+                .value="${this._updateCurrentValue(c)}"
+                .min=${c.min}
+                .max=${c.max}
+                .step=${c.step}
+                @input=${e => this._previewValue(c, e)}
+                @change=${e => this._setValue(c, e)}>
+                
+            <div class="inside-wrapper">
+                ${showIcon && iconPosition === "inside" ? html`
+                <ha-icon class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
+                ${showValue && statePosition === "inside" ? html`
+                <span id="slider-value" class="state ${statePosition}">
+                    ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
+                </span>`
+        : ""}
+            </div>
+          </div>
         </div>
       </ha-card>
-    `;
+    ` : '';
   }
 
   _updateCurrentValue(c: Controller) {
@@ -144,7 +141,6 @@ class LightSliderCard extends LitElement {
       .title-wrapper {
         display: flex;
         align-items: center;
-        margin-top: 10px;
         margin-bottom: 20px;
         max-width: 100%;
       }
@@ -175,6 +171,7 @@ class LightSliderCard extends LitElement {
         width: var(--slider-width);
         text-align: center;
         bottom: calc(0.45 * var(--slider-width));
+        pointer-events: none
       }
       .inside-wrapper > ha-icon {
         -webkit-filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
