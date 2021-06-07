@@ -63,6 +63,7 @@ const t="undefined"!=typeof window&&null!=window.customElements&&void 0!==window
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        line-height: 28px;
       }
       .state {
         margin: 10px 0px 20px 0;

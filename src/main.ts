@@ -156,6 +156,7 @@ class LightSliderCard extends LitElement {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        line-height: 28px;
       }
       .state {
         margin: 10px 0px 20px 0;
