@@ -136,13 +136,19 @@ export class LightController extends Controller {
   get _icon(): string {
     return 'mdi:lightbulb';
   }
+  get _icon_off(): string {
+    return 'mdi:lightbulb-off';
+  }
 
   get isOff() {
     return this.stateObj && this.stateObj.state === "off";
   }
+  isValueOff(value): boolean {
+    return (this.attribute == "brightness" || this.attribute == "brightness_pct") && value == 0;
+  }
 
   get string() {
-    if (this.stateObj && this.stateObj.state === "off")
+    if (this.isOff)
       return this._hass.localize("component.light.state._.off");
     switch (this.attribute) {
       case "color_temp":
@@ -180,12 +186,8 @@ export class LightController extends Controller {
     }
   }
   sliderInstantColor(value: number): string {
-    switch (this.attribute) {
-      case "brightness":
-      case "brightness_pct":
-        if (value == 0 && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
-          return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(158, 158, 158)";
-        }
+    if (this.isValueOff(value) && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
+      return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(158, 158, 158)";
     }
 
     return super.sliderInstantColor(value);

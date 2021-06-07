@@ -73,7 +73,7 @@ class LightSliderCard extends LitElement {
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
           <div class="title-wrapper">
             ${showIcon && iconPosition === "inline" ? html`
-            <ha-icon icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
+            <ha-icon id="state-icon" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
             ${showTitle ? html`
             <span class="title" style="color: ${titleColor}">${title}</span>`
@@ -96,7 +96,7 @@ class LightSliderCard extends LitElement {
                 
             <div class="inside-wrapper">
                 ${showIcon && iconPosition === "inside" ? html`
-                <ha-icon class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
+                <ha-icon id="state-icon" class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
                 ${showValue && statePosition === "inside" ? html`
                 <span id="slider-value" class="state ${statePosition}">
@@ -120,6 +120,9 @@ class LightSliderCard extends LitElement {
   _previewValue(c: Controller, e) {
     const sliderValueEl = this.shadowRoot.getElementById("slider-value");
     if (sliderValueEl) { sliderValueEl.innerText = c.instantString(e.target.value); }
+
+    const stateIconEl = this.shadowRoot.getElementById("state-icon");
+    if (stateIconEl) { stateIconEl.setAttribute("icon", c.instantIcon(e.target.value)); }
 
     if (this._config.slider_color_auto || (this._config.slider_color_rgb_0 && this._config.slider_color_rgb_100)) {
       e.target.style.setProperty('--slider-color', c.sliderInstantColor(e.target.value));

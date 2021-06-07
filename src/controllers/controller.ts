@@ -4,6 +4,7 @@ export interface ControllerConfig {
   entity: string;
   title?: string;
   icon?: string;
+  icon_off?: string;
   hide_title?: boolean;
   hide_icon?: boolean;
   hide_state?: boolean;
@@ -42,7 +43,8 @@ export abstract class Controller {
   abstract _max?: number;
   abstract _step?: number;
   abstract _icon?: string;
-  abstract _slider_color_rgb_off?: string ;
+  abstract _icon_off?: string;
+  abstract _slider_color_rgb_off?: string;
   abstract _slider_color_rgb_0?: string;
   abstract _slider_color_rgb_100?: string;
 
@@ -67,7 +69,7 @@ export abstract class Controller {
     return `${this.value}`;
   }
   instantString(value: number): string {
-    return value == 0 ? this._hass.localize("component.light.state._.off") : `${value}`;
+    return this.isValueOff(value) ? this._hass.localize("component.light.state._.off") : `${value}`;
   }
   get hidden(): boolean {
     return false;
@@ -94,6 +96,9 @@ export abstract class Controller {
   get isOff(): boolean {
     return this.value === 0;
   }
+  isValueOff(value): boolean {
+    return value == 0;
+  }
 
   get min(): number {
     return this._config.min ?? this._min ?? 0;
@@ -105,7 +110,18 @@ export abstract class Controller {
     return this._config.step ?? this._step ?? 5;
   }
   get icon(): string {
-    return this._config.icon ?? this._icon ?? this.stateObj.attributes.icon ?? 'mdi:lightbulb';
+    if (this.isOff && (this._config.icon_off || (this._icon_off && !this._config.icon))) {
+      return this._config.icon_off ?? this._icon_off;
+    } else {
+      return this._config.icon ?? this._icon ?? this.stateObj.attributes.icon ?? 'mdi:lightbulb';
+    }
+  }
+  instantIcon(value: number): string {
+    if (this.isValueOff(value) && (this._config.icon_off || (this._icon_off && !this._config.icon))) {
+      return this._config.icon_off ?? this._icon_off;
+    } else {
+      return this._config.icon ?? this._icon ?? this.stateObj.attributes.icon ?? 'mdi:lightbulb';
+    }
   }
 
   get sliderColor(): string {
