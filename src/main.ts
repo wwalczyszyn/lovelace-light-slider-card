@@ -85,8 +85,8 @@ class LightSliderCard extends LitElement {
           </span>`
         : ""}
         
-          <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight};--slider-width: ${sliderWidth};">
-            <input type="range" style="--slider-border-radius: ${sliderBorderRadius}; --state-color: ${stateColor}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor}; --thumb-size: ${thumbSize};"                  
+          <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --state-color: ${stateColor}; ">
+            <input type="range" style="--slider-border-radius: ${sliderBorderRadius}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor}; --thumb-size: ${thumbSize};"                  
                 .value="${this._updateCurrentValue(c)}"
                 .min=${c.min}
                 .max=${c.max}

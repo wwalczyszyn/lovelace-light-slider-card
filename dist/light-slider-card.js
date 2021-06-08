@@ -16,8 +16,8 @@ const t="undefined"!=typeof window&&null!=window.customElements&&void 0!==window
               ${"unavailable"===u.stateObj.state?this.hass.localize("state.default.unavailable"):u.string}
           </span>`}
         
-          <div class="range-holder ${f?"hide-thumb":""}" style="--slider-height: ${w};--slider-width: ${y};">
-            <input type="range" style="--slider-border-radius: ${S}; --state-color: ${P}; --slider-color: ${x}; --slider-thumb-color:${j}; --slider-track-color:${O}; --thumb-size: ${$};"                  
+          <div class="range-holder ${f?"hide-thumb":""}" style="--slider-height: ${w}; --slider-width: ${y}; --state-color: ${P}; ">
+            <input type="range" style="--slider-border-radius: ${S}; --slider-color: ${x}; --slider-thumb-color:${j}; --slider-track-color:${O}; --thumb-size: ${$};"                  
                 .value="${this._updateCurrentValue(u)}"
                 .min=${u.min}
                 .max=${u.max}
