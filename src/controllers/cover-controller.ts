@@ -3,6 +3,11 @@ import { Controller } from "./controller";
 export class CoverController extends Controller {
   _max;
   _min;
+  _icon?: string;
+  _icon_off?: string;
+  _slider_color_rgb_off?: string;
+  _slider_color_rgb_0?: string;
+  _slider_color_rgb_100?: string;
 
   get attribute() {
     return this._config.attribute || "position";
@@ -53,8 +58,19 @@ export class CoverController extends Controller {
     }
   }
 
-  get hasToggle() {
-    return false;
+  instantString(value: number): string {
+    switch (this.attribute) {
+      case "position":
+        if (value == 0)
+          return this._hass.localize("component.cover.state._.closed");
+        if (value == 100)
+          return this._hass.localize("component.cover.state._.open");
+        return `${value} %`;
+      case "tilt":
+        return `${value}`;
+    }
+
+    return "";
   }
 
   get hasSlider() {

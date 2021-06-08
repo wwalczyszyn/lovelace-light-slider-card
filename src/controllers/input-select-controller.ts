@@ -2,6 +2,11 @@ import { Controller } from "./controller";
 
 export class InputSelectController extends Controller {
   _min;
+  _icon?: string;
+  _icon_off?: string;
+  _slider_color_rgb_off?: string;
+  _slider_color_rgb_0?: string;
+  _slider_color_rgb_100?: string;
 
   get _value() {
     return this.stateObj.attributes.options.indexOf(this.stateObj.state);
@@ -23,7 +28,7 @@ export class InputSelectController extends Controller {
     return false;
   }
 
-  get hasToggle() {
+  isValueOff(value): boolean {
     return false;
   }
 

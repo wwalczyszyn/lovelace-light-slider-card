@@ -81,18 +81,6 @@ export abstract class Controller {
     return true;
   }
 
-  renderToggle(hass: any) {
-    return this.hasToggle
-      ? html`
-          <ha-entity-toggle
-            .stateObj=${hass.states[this.stateObj.entity_id]}
-            .hass=${hass}
-            .class="state"
-          ></ha-entity-toggle>
-        `
-      : undefined;
-  }
-
   get isOff(): boolean {
     return this.value === 0;
   }
@@ -109,6 +97,7 @@ export abstract class Controller {
   get step(): number {
     return this._config.step ?? this._step ?? 5;
   }
+
   get icon(): string {
     if (this.isOff && (this._config.icon_off || (this._icon_off && !this._config.icon))) {
       return this._config.icon_off ?? this._icon_off;
@@ -126,12 +115,17 @@ export abstract class Controller {
 
   get sliderColor(): string {
     if (this.isOff && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
-      return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(158, 158, 158)";
+      return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(70, 70, 70)";
     } else {
       return this.sliderInstantColor(this.value);
     }
   }
+
   sliderInstantColor(value: number): string {
+    if (this.isValueOff(value) && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
+      return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(70, 70, 70)";
+    }
+
     if (this._config.slider_color_auto || (this._config.slider_color_rgb_0 && this._config.slider_color_rgb_100)) {
       const startColor = this._config.slider_color_rgb_0 ?? this._slider_color_rgb_0 ?? "rgb(158, 158, 158)";
       const endColor = this._config.slider_color_rgb_100 ?? this._slider_color_rgb_100 ?? "rgb(250, 250, 250)";

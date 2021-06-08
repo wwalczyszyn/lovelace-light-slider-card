@@ -58,6 +58,7 @@ export class LightController extends Controller {
         return 0;
     }
   }
+
   get _max() {
     switch (this.attribute) {
       case "color_temp":
@@ -143,6 +144,7 @@ export class LightController extends Controller {
   get isOff() {
     return this.stateObj && this.stateObj.state === "off";
   }
+
   isValueOff(value): boolean {
     return (this.attribute == "brightness" || this.attribute == "brightness_pct") && value == 0;
   }
@@ -166,6 +168,7 @@ export class LightController extends Controller {
         return this.value;
     }
   }
+
   instantString(value: number): string {
     switch (this.attribute) {
       case "color_temp":
@@ -185,17 +188,8 @@ export class LightController extends Controller {
         return `${value}`;
     }
   }
-  sliderInstantColor(value: number): string {
-    if (this.isValueOff(value) && (this._config.slider_color_auto || this._config.slider_color_rgb_off)) {
-      return this._config.slider_color_rgb_off ?? this._slider_color_rgb_off ?? "rgb(158, 158, 158)";
-    }
 
-    return super.sliderInstantColor(value);
-  }
-
-  get _slider_color_rgb_off(): string {
-    return "rgb(70, 70, 70)";
-  }
+  _slider_color_rgb_off?: string;
 
   get _slider_color_rgb_0(): string {
     switch (this.attribute) {

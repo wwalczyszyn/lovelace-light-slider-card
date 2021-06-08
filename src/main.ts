@@ -61,12 +61,12 @@ class LightSliderCard extends LitElement {
     const sliderColor = this._config.slider_color ? this._config.slider_color : c.sliderColor;
     const trackColor = this._config.slider_track_color ? this._config.slider_track_color : c.sliderTrackColor;
     const thumbColor = this._config.slider_thumb_color ? this._config.slider_thumb_color : c.sliderThumbColor;
-    const thumbSize = this._config.slider_thumb_size ?? "80px";
+    const thumbSize = this._config.slider_thumb_size ?? "100px";
     const stateColor = this._config.state_color ?? "var(--primary-text-color)";
     const titleColor = this._config.title_color ?? "var(--primary-text-color)";
     const iconColor = this._config.icon_color ?? "var(--primary-text-color)";
-    const iconSize = this._config.icon_size;
     const iconPosition = this._config.icon_position ?? "inline";
+    const iconSize = this._config.icon_size ?? (iconPosition === "inside") ? "40px" : null;
 
     return showSlider ? html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
@@ -124,14 +124,19 @@ class LightSliderCard extends LitElement {
     const stateIconEl = this.shadowRoot.getElementById("state-icon");
     if (stateIconEl) { stateIconEl.setAttribute("icon", c.instantIcon(e.target.value)); }
 
-    if (this._config.slider_color_auto || (this._config.slider_color_rgb_0 && this._config.slider_color_rgb_100)) {
-      e.target.style.setProperty('--slider-color', c.sliderInstantColor(e.target.value));
-    }
+    e.target.style.setProperty('--slider-color', c.sliderInstantColor(e.target.value));
   }
 
   _setValue(c: Controller, e) {
     c.value = e.target.value
 
+    const sliderValueEl = this.shadowRoot.getElementById("slider-value");
+    if (sliderValueEl) { sliderValueEl.innerText = c.instantString(e.target.value); }
+
+    const stateIconEl = this.shadowRoot.getElementById("state-icon");
+    if (stateIconEl) { stateIconEl.setAttribute("icon", c.instantIcon(e.target.value)); }
+
+    e.target.style.setProperty('--slider-color', c.sliderInstantColor(e.target.value));
   }
 
   static get styles() {
@@ -173,7 +178,7 @@ class LightSliderCard extends LitElement {
       }
       .inside-wrapper {
         position: absolute;
-        width: var(--slider-width);
+        width: 100%;
         text-align: center;
         bottom: calc(0.45 * var(--slider-width));
         pointer-events: none
