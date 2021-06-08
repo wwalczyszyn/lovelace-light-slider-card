@@ -1,8 +1,8 @@
 {
-  "name": "slider-entity-row",
+  "name": "light-slider-card",
   "private": true,
-  "version": "17.0.1",
-  "description": "slider-entity-row =================",
+  "version": "1.0.0",
+  "description": "light-slider-card =================",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c --watch",
@@ -10,10 +10,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com:thomasloven/lovelace-slider-entity-row"
+    "url": "github.com:wwalczyszyn/lovelace-light-slider-card"
   },
   "keywords": [],
-  "author": "Thomas Lovén",
+  "author": "Wojciech Walczyszyn",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.13.1",

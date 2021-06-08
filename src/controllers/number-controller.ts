@@ -1,6 +1,12 @@
 import { Controller } from "./controller";
 
 export class NumberController extends Controller {
+  _icon?: string;
+  _icon_off?: string;
+  _slider_color_rgb_off?: string;
+  _slider_color_rgb_0?: string;
+  _slider_color_rgb_100?: string;
+
   get _value() {
     return this.stateObj.state;
   }
@@ -13,16 +19,20 @@ export class NumberController extends Controller {
   }
 
   get string() {
-    return `${parseFloat(this.stateObj.state)} ${
-      this.stateObj.attributes.unit_of_measurement || ""
-    }`.trim();
+    return `${parseFloat(this.stateObj.state)} ${this.stateObj.attributes.unit_of_measurement || ""
+      }`.trim();
+  }
+
+  instantString(value: number): string {
+    return `${value} ${this.stateObj.attributes.unit_of_measurement || ""
+      }`.trim();
   }
 
   get isOff() {
     return false;
   }
 
-  get hasToggle() {
+  isValueOff(value): boolean {
     return false;
   }
 

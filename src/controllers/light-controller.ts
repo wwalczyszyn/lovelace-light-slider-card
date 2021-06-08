@@ -10,29 +10,31 @@ export class LightController extends Controller {
 
   get _value() {
     if (!this.stateObj || this.stateObj.state !== "on") return 0;
-    const attr = this.stateObj.attributes;
+    const attrs = this.stateObj.attributes;
     switch (this.attribute) {
       case "color_temp":
-        return Math.round(attr.color_temp);
+        return attrs.color_temp;
+      case "color_temp_pct":
+        return (attrs.color_temp - attrs.min_mireds) / (attrs.max_mireds - attrs.min_mireds) * 100;
       case "white_value":
-        return Math.round(attr.white_value);
+        return attrs.white_value;
       case "brightness":
-        return Math.round(attr.brightness);
+        return attrs.brightness;
       case "brightness_pct":
-        return Math.round((attr.brightness * 100.0) / 255);
+        return attrs.brightness * 100.0 / 255;
       case "red":
       case "green":
       case "blue":
-        return attr.rgb_color
-          ? Math.round(attr.rgb_color[RGB_INDEX[this.attribute]])
+        return attrs.rgb_color
+          ? attrs.rgb_color[RGB_INDEX[this.attribute]]
           : 0;
       case "hue":
       case "saturation":
-        return attr.hs_color
-          ? Math.round(attr.hs_color[HS_INDEX[this.attribute]])
+        return attrs.hs_color
+          ? attrs.hs_color[HS_INDEX[this.attribute]]
           : 0;
       case "effect":
-        if (attr.effect_list) return attr.effect_list.indexOf(attr.effect);
+        if (attrs.effect_list) return attrs.effect_list.indexOf(attrs.effect);
         return 0;
       default:
         return 0;
@@ -56,6 +58,7 @@ export class LightController extends Controller {
         return 0;
     }
   }
+
   get _max() {
     switch (this.attribute) {
       case "color_temp":
@@ -81,16 +84,21 @@ export class LightController extends Controller {
 
   set _value(value) {
     if (!this.stateObj) return;
+    const attrs = this.stateObj.attributes;
     let attr = this.attribute;
     let on = true;
     let _value;
     switch (attr) {
+      case "color_temp_pct":
+        value = Math.round(value / 100 * (attrs.max_mireds - attrs.min_mireds)) + attrs.min_mireds;
+        attr = "color_temp"
+        break;
       case "brightness":
       case "brightness_pct":
         value =
           attr === "brightness"
             ? Math.round(value)
-            : Math.round((value / 100.0) * 255);
+            : Math.round(value / 100.0 * 255);
         if (!value) on = false;
         attr = "brightness";
         break;
@@ -126,14 +134,29 @@ export class LightController extends Controller {
       });
     }
   }
+  get _icon(): string {
+    return 'mdi:lightbulb';
+  }
+  get _icon_off(): string {
+    return 'mdi:lightbulb-off';
+  }
+
+  get isOff() {
+    return this.stateObj && this.stateObj.state === "off";
+  }
+
+  isValueOff(value): boolean {
+    return (this.attribute == "brightness" || this.attribute == "brightness_pct") && value == 0;
+  }
 
   get string() {
-    if (this.stateObj && this.stateObj.state === "off")
+    if (this.isOff)
       return this._hass.localize("component.light.state._.off");
     switch (this.attribute) {
       case "color_temp":
       case "brightness":
         return `${this.value}`;
+      case "color_temp_pct":
       case "brightness_pct":
       case "saturation":
         return `${this.value} %`;
@@ -143,6 +166,54 @@ export class LightController extends Controller {
         return this.stateObj ? this.stateObj.attributes.effect : "";
       default:
         return this.value;
+    }
+  }
+
+  instantString(value: number): string {
+    switch (this.attribute) {
+      case "color_temp":
+        return `${value}`;
+      case "brightness":
+        return value == 0 ? this._hass.localize("component.light.state._.off") : `${value}`;
+      case "brightness_pct":
+        return value == 0 ? this._hass.localize("component.light.state._.off") : `${value} %`;
+      case "color_temp_pct":
+      case "saturation":
+        return `${value} %`;
+      case "hue":
+        return `${value} °`;
+      case "effect":
+        return this.stateObj ? `${value}` : "";
+      default:
+        return `${value}`;
+    }
+  }
+
+  _slider_color_rgb_off?: string;
+
+  get _slider_color_rgb_0(): string {
+    switch (this.attribute) {
+      case "color_temp":
+      case "color_temp_pct":
+        return "rgb(226, 250, 255)";
+      case "brightness":
+      case "brightness_pct":
+        return "rgb(82, 82, 82)";
+      default:
+        return null;
+    }
+  }
+
+  get _slider_color_rgb_100(): string {
+    switch (this.attribute) {
+      case "color_temp":
+      case "color_temp_pct":
+        return "rgb(255, 180, 0)";
+      case "brightness":
+      case "brightness_pct":
+        return "rgb(240, 240, 240)";
+      default:
+        return null;
     }
   }
 
@@ -159,6 +230,7 @@ export class LightController extends Controller {
           return true;
         return false;
       case "color_temp":
+      case "color_temp_pct":
         if ("color_temp" in this.stateObj.attributes) return true;
         if (
           "supported_features" in this.stateObj.attributes &&
