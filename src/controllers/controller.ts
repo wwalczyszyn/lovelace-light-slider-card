@@ -3,6 +3,7 @@ import { html } from "lit-element";
 export interface ControllerConfig {
   entity: string;
   title?: string;
+  horizontal?: boolean;
   icon?: string;
   icon_off?: string;
   hide_title?: boolean;

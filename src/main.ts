@@ -41,12 +41,6 @@ class LightSliderCard extends LitElement {
         </hui-warning>
       `;
 
-    const dir = this.hass.translationMetadata.translations[
-      this.hass.language || "en"
-    ].isRTL
-      ? "rtl"
-      : "ltr";
-
     const showSlider = c.stateObj.state !== "unavailable" && c.hasSlider;
     const showValue = !this._config.hide_state;
     const showTitle = !this._config.hide_title;
@@ -54,19 +48,20 @@ class LightSliderCard extends LitElement {
     const hideThumb = this._config.hide_thumb;
     const transparentCard = this._config.transparent_card;
     const title = this._config.title ?? c.stateObj.attributes.friendly_name;
-    const statePosition = this._config.state_position ?? "above";
-    const sliderWidth = this._config.slider_width ?? "150px";
-    const sliderHeight = this._config.slider_height ?? "400px";
+    const horizontal = this._config.horizontal ?? false;
+    const statePosition = this._config.state_position ?? "before";
+    const sliderWidth = horizontal ? this._config.slider_height ?? "100px" : this._config.slider_width ?? "150px";
+    const sliderHeight = horizontal ? this._config.slider_width ?? "100%" : this._config.slider_height ?? "400px";
     const sliderBorderRadius = this._config.slider_corner_radius ?? "var(--ha-card-border-radius)";
     const sliderColor = this._config.slider_color ? this._config.slider_color : c.sliderColor;
     const trackColor = this._config.slider_track_color ? this._config.slider_track_color : c.sliderTrackColor;
     const thumbColor = this._config.slider_thumb_color ? this._config.slider_thumb_color : c.sliderThumbColor;
-    const thumbSize = this._config.slider_thumb_size ?? "100px";
+    const thumbSize = hideThumb ? 0 : this._config.slider_thumb_size ?? "100px";
     const stateColor = this._config.state_color ?? "var(--primary-text-color)";
     const titleColor = this._config.title_color ?? "var(--primary-text-color)";
     const iconColor = this._config.icon_color ?? "var(--primary-text-color)";
     const iconPosition = this._config.icon_position ?? "inline";
-    const iconSize = this._config.icon_size ?? (iconPosition === "inside") ? "40px" : null;
+    const iconSize = this._config.icon_size ?? ((iconPosition === "inside") ? "40px" : null);
 
     return showSlider ? html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
@@ -79,30 +74,35 @@ class LightSliderCard extends LitElement {
             <span class="title" style="color: ${titleColor}">${title}</span>`
         : ""}
           </div>
-        ${showValue && (statePosition === "above" || statePosition === "below") ? html`
-          <span id="slider-value" class="state ${statePosition}">
-              ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
-          </span>`
+          <div class="slider-wrapper ${horizontal ? 'horizontal' : 'vertical'}">
+          ${showIcon && (iconPosition === "before" || iconPosition === "after") ? html`
+            <ha-icon id="state-icon" icon="${c.icon}" class="${iconPosition}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
-        
-          <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --state-color: ${stateColor}; ">
-            <input type="range" style="--slider-border-radius: ${sliderBorderRadius}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor}; --thumb-size: ${thumbSize};"                  
-                .value="${this._updateCurrentValue(c)}"
-                .min=${c.min}
-                .max=${c.max}
-                .step=${c.step}
-                @input=${e => this._previewValue(c, e)}
-                @change=${e => this._setValue(c, e)}>
-                
-            <div class="inside-wrapper">
-                ${showIcon && iconPosition === "inside" ? html`
-                <ha-icon id="state-icon" class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
-        : ""}
-                ${showValue && statePosition === "inside" ? html`
-                <span id="slider-value" class="state ${statePosition}">
-                    ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
-                </span>`
-        : ""}
+          ${showValue && (statePosition === "before" || statePosition === "after") ? html`
+            <span id="slider-value" class="state ${statePosition}">
+                ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
+            </span>`
+          : ""}
+          
+            <div class="range-holder ${hideThumb ? 'hide-thumb' : ''}" style="--slider-height: ${sliderHeight}; --slider-width: ${sliderWidth}; --state-color: ${stateColor}; ">
+              <input type="range" style="--slider-border-radius: ${sliderBorderRadius}; --slider-color: ${sliderColor}; --slider-thumb-color:${thumbColor}; --slider-track-color:${trackColor}; --thumb-size: ${thumbSize};"                  
+                  .value="${this._updateCurrentValue(c)}"
+                  .min=${c.min}
+                  .max=${c.max}
+                  .step=${c.step}
+                  @input=${e => this._previewValue(c, e)}
+                  @change=${e => this._setValue(c, e)}>
+                  
+              <div class="inside-wrapper">
+                  ${showIcon && iconPosition === "inside" ? html`
+                  <ha-icon id="state-icon" class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
+          : ""}
+                  ${showValue && statePosition === "inside" ? html`
+                  <span id="slider-value" class="state ${statePosition}">
+                      ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
+                  </span>`
+          : ""}
+              </div>
             </div>
           </div>
         </div>
@@ -142,10 +142,10 @@ class LightSliderCard extends LitElement {
   static get styles() {
     return css`
       .wrapper {
+        padding: 10px;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-        flex: 100;
+        flex-direction: column;
       }
       .title-wrapper {
         display: flex;
@@ -163,6 +163,16 @@ class LightSliderCard extends LitElement {
         white-space: nowrap;
         line-height: 28px;
       }
+      .slider-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        flex-direction: column;
+      }
+      .slider-wrapper.horizontal {
+        flex-direction: row;
+      }
       .state {
         margin: 10px 0px 20px 0;
         font-size: 22px;
@@ -172,16 +182,57 @@ class LightSliderCard extends LitElement {
         overflow: hidden;
         white-space: nowrap;
       }
-      .state.below {
+      .horizontal .state {
+        text-overflow: initial;
+        overflow: visible;
+        margin: 0px 20px 0px 10px;
+      }
+      .state.after {
+        order: 2;
+        margin: 20px 0px 10px 0;
+      }
+      ha-icon.before {
+        margin: 10px 0px 20px 0;
+      }
+      ha-icon.after {
         order: 1;
         margin: 20px 0px 10px 0;
+      }
+      .horizontal ha-icon.before {
+        margin: 0px 20px 0px 10px;
+      }
+      .horizontal ha-icon.after {
+        order: 1;
+        margin: 0px 10px 0px 20px;
+      }
+      .horizontal .state.after {
+        margin: 0px 10px 0px 20px;
+      }
+      ha-icon.before + .state.before,
+      ha-icon.after + .state.after {
+        margin: 10px 0px 10px 0;
+      }
+      .horizontal ha-icon.before + .state.before,
+      .horizontal ha-icon.after + .state.after {
+        margin: 0px 10px 0px 10px;
       }
       .inside-wrapper {
         position: absolute;
         width: 100%;
         text-align: center;
         bottom: calc(0.45 * var(--slider-width));
-        pointer-events: none
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+      }
+      .horizontal .inside-wrapper {
+        bottom: initial;
+        left: calc(0.45 * var(--slider-width));
+        flex-direction: row;
+        height: 100%;
+        width: initial;
       }
       .inside-wrapper > ha-icon {
         -webkit-filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
@@ -194,13 +245,8 @@ class LightSliderCard extends LitElement {
         -webkit-filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
         filter: drop-shadow(rgba(0, 0, 0, 0.2) 0 1px 3px);
       }
-      .wrapper {
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        flex: 100;
-        flex-direction: column;
+      .horizontal .state.inside {
+        margin: 10px 0 10px 20px;
       }
       .range-holder {
         height: var(--slider-height);
@@ -209,6 +255,10 @@ class LightSliderCard extends LitElement {
         display: block;
         margin: auto;
       }
+      .horizontal .range-holder {
+        height: var(--slider-width);
+        width: var(--slider-height);
+      }
       .range-holder input[type="range"] {
           outline: 0;
           border: 0;
@@ -216,11 +266,6 @@ class LightSliderCard extends LitElement {
           width: var(--slider-height);
           margin: 0;
           //transition: box-shadow 0.2s ease-in-out;
-          -webkit-transform:rotate(270deg);
-          -moz-transform:rotate(270deg);
-          -o-transform:rotate(270deg);
-          -ms-transform:rotate(270deg);
-          transform:rotate(270deg);
           overflow: hidden;
           height: var(--slider-width);
           -webkit-appearance: none;
@@ -228,6 +273,13 @@ class LightSliderCard extends LitElement {
           position: absolute;
           top: calc(50% - (var(--slider-width) / 2));
           right: calc(50% - (var(--slider-height) / 2));
+      }
+      .vertical .range-holder input[type="range"] {
+          -webkit-transform:rotate(270deg);
+          -moz-transform:rotate(270deg);
+          -o-transform:rotate(270deg);
+          -ms-transform:rotate(270deg);
+          transform:rotate(270deg);
       }
       .range-holder input[type="range"]::-webkit-slider-runnable-track {
           height: var(--slider-width);
