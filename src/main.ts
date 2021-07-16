@@ -66,7 +66,7 @@ class LightSliderCard extends LitElement {
     return showSlider ? html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
-          <div class="title-wrapper">
+          <div class="title-wrapper" style="${!showTitle || !showIcon || iconPosition != "inline" ? "display: none;" : ""}">
             ${showIcon && iconPosition === "inline" ? html`
             <ha-icon id="state-icon" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
@@ -259,6 +259,7 @@ class LightSliderCard extends LitElement {
       .horizontal .range-holder {
         height: var(--slider-width);
         width: var(--slider-height);
+        margin-right: 0;
       }
       .range-holder input[type="range"] {
           outline: 0;

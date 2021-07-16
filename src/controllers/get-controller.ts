@@ -6,6 +6,7 @@ import { FanController } from "./fan-controller";
 import { InputNumberController } from "./input-number-controller";
 import { InputSelectController } from "./input-select-controller";
 import { NumberController } from "./number-controller";
+import { VacuumController } from "./vacuum-controller";
 
 export function getController(domain: string) {
   return {
@@ -17,5 +18,6 @@ export function getController(domain: string) {
     input_number: InputNumberController,
     input_select: InputSelectController,
     number: NumberController,
+    vacuum: VacuumController,
   }[domain];
 }
