@@ -19,7 +19,7 @@ export class ClimateController extends Controller {
           case "off":
             return "mdi:power";
           case "dry":
-            return "mdi:water-opacity"
+            return "mdi:water"
           case "cool":
             return "mdi:snowflake"
           case "heat":
@@ -116,6 +116,50 @@ export class ClimateController extends Controller {
         return `${value} ${this._hass.config.unit_system.temperature}`;
       default:
         return this._hass.localize("component.climate.state._." + this.hvacModes[value]);
+    }
+  }
+
+  instantIcon(value: number): string {
+    switch (this.attribute) {
+      case "fan_mode":
+        case "temperature":
+        return this._icon;
+      default:
+        switch (this.hvacModes[value]) {
+          case "off":
+            return "mdi:power";
+          case "dry":
+            return "mdi:water"
+          case "cool":
+            return "mdi:snowflake"
+          case "heat":
+            return "mdi:fire"
+          case "fan_only":
+          default:
+            return "mdi:fan"
+        }
+    }
+  }
+
+  sliderInstantColor(value: number): string {
+    switch (this.attribute) {
+      case "fan_mode":
+      case "temperature":
+        return super.sliderInstantColor(value);
+      default:
+        switch (this.hvacModes[value]) {
+          case "off":
+            return "rgb(128, 128, 128)";
+          case "dry":
+            return "rgb(166, 233, 255)"
+          case "cool":
+            return "rgb(0, 191, 255)"
+          case "heat":
+            return "rgb(220, 20, 60)"
+          case "fan_only":
+          default:
+            return "rgb(250, 250, 250)"
+        }
     }
   }
 
