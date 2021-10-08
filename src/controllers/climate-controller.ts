@@ -1,18 +1,33 @@
 import { Controller } from "./controller";
 
 export class ClimateController extends Controller {
+  hvacModes: Array<String> = ["off", "fan_only", "dry", "cool", "heat"];
   _slider_color_rgb_off?: string;
 
   get attribute() {
-    return this._config.attribute || "temperature";
+    return this._config.attribute;
   }
 
   get _icon(): string {
     switch (this.attribute) {
       case "fan_mode":
         return "mdi:fan";
-      default:
+      case "temperature":
         return "mdi:thermometer";
+      default:
+        switch (this._value) {
+          case "off":
+            return "mdi:power";
+          case "dry":
+            return "mdi:water-opacity"
+          case "cool":
+            return "mdi:snowflake"
+          case "heat":
+            return "mdi:fire"
+          case "fan_only":
+          default:
+            return "mdi:fan"
+        }
     }
   }
 
@@ -20,8 +35,10 @@ export class ClimateController extends Controller {
     switch (this.attribute) {
       case "fan_mode":
         return "mdi:fan-off";
-      default:
+      case "temperature":
         return "mdi:thermometer-off";
+      default:
+        return "mdi:power";
     }
   }
 
@@ -42,8 +59,10 @@ export class ClimateController extends Controller {
           const modes = this.stateObj.attributes.fan_modes;
           return modes.indexOf(this.stateObj.attributes.fan_mode) + 1;
         }
-      default:
+      case "temperature":
         return this.stateObj.attributes.temperature;
+      default:
+        return this.hvacModes.indexOf(this.stateObj.state);
     }
   }
 
@@ -63,12 +82,16 @@ export class ClimateController extends Controller {
         }
         break;
       case "temperature":
-      default:
         this._hass.callService("climate", "set_temperature", {
           entity_id: this.stateObj.entity_id,
           temperature: value,
         });
         break;
+      default:
+        this._hass.callService("climate", "set_hvac_mode", {
+          entity_id: this.stateObj.entity_id,
+          hvac_mode: this.hvacModes[value],
+        });
     }
   }
 
@@ -77,8 +100,10 @@ export class ClimateController extends Controller {
       case "fan_mode":
         if (this.isOff) return this._hass.localize("component.climate.state._.off");
         return this.stateObj.attributes.fan_mode;
-      default:
+      case "temperature":
         return `${this.value} ${this._hass.config.unit_system.temperature}`;
+      default:
+        return this._hass.localize("component.climate.state._." + this.stateObj.state);
     }
   }
 
@@ -87,8 +112,10 @@ export class ClimateController extends Controller {
       case "fan_mode":
         const modes = [this._hass.localize("component.climate.state._.off")].concat(this.stateObj.attributes.fan_modes);
         return modes[value];
-      default:
+      case "temperature":
         return `${value} ${this._hass.config.unit_system.temperature}`;
+      default:
+        return this._hass.localize("component.climate.state._." + this.hvacModes[value]);
     }
   }
 
@@ -100,16 +127,20 @@ export class ClimateController extends Controller {
     switch (this.attribute) {
       case "fan_mode":
         return 0;
-      default:
+      case "temperature":
         return this.stateObj.attributes.min_temp;
+      default:
+        return 0;
     }
   }
   get _max() {
     switch (this.attribute) {
       case "fan_mode":
         return this.stateObj.attributes.fan_modes.length;
-      default:
+      case "temperature":
         return this.stateObj.attributes.max_temp;
+      default:
+        return this.hvacModes.length - 1;
     }
   }
   get _step() {
