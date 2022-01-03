@@ -27,6 +27,7 @@ export interface ControllerConfig {
   icon_color?: string;
   icon_size?: string;
   icon_position?: string;
+  state_font_size?: string;
   slider_corner_radius?: string;
   slider_color_rgb_off?: string;
   slider_color_rgb_0?: string;

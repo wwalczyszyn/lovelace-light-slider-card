@@ -62,6 +62,7 @@ class LightSliderCard extends LitElement {
     const iconColor = this._config.icon_color ?? "var(--primary-text-color)";
     const iconPosition = this._config.icon_position ?? "inline";
     const iconSize = this._config.icon_size ?? ((iconPosition === "inside") ? "40px" : null);
+    const stateSize = this._config.state_font_size;
 
     return showSlider ? html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
@@ -79,7 +80,7 @@ class LightSliderCard extends LitElement {
             <ha-icon id="state-icon" icon="${c.icon}" class="${iconPosition}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
           ${showValue && (statePosition === "before" || statePosition === "after") ? html`
-            <span id="slider-value" class="state ${statePosition}">
+            <span id="slider-value" class="state ${statePosition}" style="${stateSize ? `--state-font-size: ${stateSize}` : ''}">
                 ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
             </span>`
           : ""}
@@ -98,7 +99,7 @@ class LightSliderCard extends LitElement {
                   <ha-icon id="state-icon" class="${iconPosition}" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
           : ""}
                   ${showValue && statePosition === "inside" ? html`
-                  <span id="slider-value" class="state ${statePosition}">
+                  <span id="slider-value" class="state ${statePosition}" style="${stateSize ? `--state-font-size: ${stateSize}` : ''}">
                       ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
                   </span>`
           : ""}
@@ -175,7 +176,7 @@ class LightSliderCard extends LitElement {
       }
       .state {
         margin: 10px 0px 20px 0;
-        font-size: 22px;
+        font-size: var(--state-font-size, 22px);
         color: var(--state-color);
         max-width: 100%;
         text-overflow: ellipsis;
@@ -289,6 +290,7 @@ class LightSliderCard extends LitElement {
           background-color: var(--slider-track-color);
           margin-top: -1px;
           //transition: box-shadow 0.2s ease-in-out;
+          
       }
       .range-holder input[type="range"]::-moz-thumb-track {
         height: var(--slider-width);
