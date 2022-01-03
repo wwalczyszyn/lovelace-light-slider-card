@@ -1,4 +1,6 @@
-import { html } from "lit-element";
+import {
+  ActionConfig
+} from 'custom-card-helpers';
 
 export interface ControllerConfig {
   entity: string;
@@ -33,6 +35,7 @@ export interface ControllerConfig {
   slider_color_rgb_0?: string;
   slider_color_rgb_100?: string;
   slider_color_auto?: boolean;
+  tap_action?: ActionConfig;
 }
 
 export abstract class Controller {

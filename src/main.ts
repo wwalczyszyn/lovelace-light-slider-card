@@ -1,4 +1,8 @@
-import { LitElement, html, css, property } from "lit-element";
+import { LitElement, PropertyValues, html, css, property } from "lit-element";
+import {
+  handleClick,
+  MoreInfoActionConfig
+} from 'custom-card-helpers';
 
 import { getController } from "./controllers/get-controller";
 import { Controller, ControllerConfig } from "./controllers/controller";
@@ -6,6 +10,7 @@ import pjson from "../package.json";
 
 class LightSliderCard extends LitElement {
   _config: ControllerConfig;
+  firstRender: boolean = true;
   ctrl: Controller;
 
   @property() hass: any;
@@ -25,6 +30,10 @@ class LightSliderCard extends LitElement {
 
   async firstUpdated() {
     await this.resized();
+  }
+
+  protected shouldUpdate(changedProps: PropertyValues): boolean {
+    return this.firstRender || this.myHasConfigOrEntityChanged(changedProps);
   }
 
   render() {
@@ -63,11 +72,15 @@ class LightSliderCard extends LitElement {
     const iconPosition = this._config.icon_position ?? "inline";
     const iconSize = this._config.icon_size ?? ((iconPosition === "inside") ? "40px" : null);
     const stateSize = this._config.state_font_size;
+    const tapAction = this._config.tap_action ?? { action: "more-info", haptic: "medium" } as MoreInfoActionConfig;
+
+    this.firstRender = false;
 
     return showSlider ? html`
       <ha-card style="${transparentCard ? 'background: none; box-shadow: none;' : ''}">
         <div class="wrapper" @click=${(ev) => ev.stopPropagation()}>
-          <div class="title-wrapper" style="${!showTitle || !showIcon || iconPosition != "inline" ? "display: none;" : ""}">
+          <div class="title-wrapper ${tapAction && tapAction.action != "none" ? 'clickable' : ''}" style="${!showTitle || !showIcon || iconPosition != "inline" ? "display: none;" : ""}"
+          @click=${event => handleClick(event.target, this.hass, { entity: this._config.entity, tap_action: tapAction }, false, false)}>
             ${showIcon && iconPosition === "inline" ? html`
             <ha-icon id="state-icon" icon="${c.icon}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
         : ""}
@@ -77,10 +90,12 @@ class LightSliderCard extends LitElement {
           </div>
           <div class="slider-wrapper ${horizontal ? 'horizontal' : 'vertical'}">
           ${showIcon && (iconPosition === "before" || iconPosition === "after") ? html`
-            <ha-icon id="state-icon" icon="${c.icon}" class="${iconPosition}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"></ha-icon>`
+            <ha-icon id="state-icon" icon="${c.icon}" class="${iconPosition} ${tapAction && tapAction.action != "none" ? 'clickable' : ''}" style="color: ${iconColor}; ${iconSize ? `--mdc-icon-size: ${iconSize};` : ''}"
+            @click=${event => handleClick(event.target, this.hass, { entity: this._config.entity, tap_action: tapAction }, false, false)}></ha-icon>`
         : ""}
           ${showValue && (statePosition === "before" || statePosition === "after") ? html`
-            <span id="slider-value" class="state ${statePosition}" style="${stateSize ? `--state-font-size: ${stateSize}` : ''}">
+            <span id="slider-value" class="state ${statePosition} ${tapAction && tapAction.action != "none" ? 'clickable' : ''}" style="${stateSize ? `--state-font-size: ${stateSize}` : ''}"
+            @click=${event => handleClick(event.target, this.hass, { entity: this._config.entity, tap_action: tapAction }, false, false)}>
                 ${c.stateObj.state === "unavailable" ? this.hass.localize("state.default.unavailable") : c.string}
             </span>`
           : ""}
@@ -140,6 +155,24 @@ class LightSliderCard extends LitElement {
     e.target.style.setProperty('--slider-color', c.sliderInstantColor(e.target.value));
   }
 
+  private myHasConfigOrEntityChanged(changedProps: PropertyValues): boolean {
+    if (changedProps.has('_config')) {
+      return true;
+    }
+
+    const oldHass = changedProps.get('hass') as any | undefined;
+    if (oldHass) {
+      const element = this;
+
+      function hasChanged(elt: string): boolean {
+        return oldHass?.states[elt] !== element.hass!.states[elt];
+      }
+      return hasChanged(this._config.entity);
+    }
+
+    return false;
+  }
+
   static get styles() {
     return css`
       .wrapper {
@@ -147,6 +180,9 @@ class LightSliderCard extends LitElement {
         display: flex;
         align-items: center;
         flex-direction: column;
+      }
+      .clickable {
+        cursor: pointer;
       }
       .title-wrapper {
         display: flex;
