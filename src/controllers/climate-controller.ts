@@ -122,8 +122,12 @@ export class ClimateController extends Controller {
   instantIcon(value: number): string {
     switch (this.attribute) {
       case "fan_mode":
-        case "temperature":
-        return this._icon;
+      case "temperature":
+        if (this.isValueOff(value)) {
+          return this._icon_off;
+        } else {
+          return this._icon;
+        }
       default:
         switch (this.hvacModes[value]) {
           case "off":
