@@ -1,8 +1,11 @@
-import { html } from "lit-element";
+import {
+  ActionConfig
+} from 'custom-card-helpers';
 
 export interface ControllerConfig {
   entity: string;
   title?: string;
+  horizontal?: boolean;
   icon?: string;
   icon_off?: string;
   hide_title?: boolean;
@@ -26,11 +29,13 @@ export interface ControllerConfig {
   icon_color?: string;
   icon_size?: string;
   icon_position?: string;
+  state_font_size?: string;
   slider_corner_radius?: string;
   slider_color_rgb_off?: string;
   slider_color_rgb_0?: string;
   slider_color_rgb_100?: string;
   slider_color_auto?: boolean;
+  tap_action?: ActionConfig;
 }
 
 export abstract class Controller {
